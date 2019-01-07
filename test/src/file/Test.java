@@ -6,7 +6,7 @@ import java.io.File;
 
 public class Test {
     public static void main(String[] args){
-        File folder = new File("D:\\新建文件夹");
+        File folder = new File("D:\\MyGit\\Sparks\\src");
         String keyword = "Repository.cs";
         if (!folder.exists()) { // 如果文件夹不存在
             System.out.println("目录不存在：" + folder.getAbsolutePath());

@@ -11,8 +11,9 @@ public class FileSearch {
     public static File[] searchFile(File folder, final String keyWord) {
 
         File[] subFolders = folder.listFiles(new FileFilter() {
+            //accept方法
             @Override
-            public boolean accept(File pathname) {// 实现FileFilter类的accept方法
+            public boolean accept(File pathname) {
                 if (pathname.isDirectory()
                         || (pathname.isFile() && pathname.getName().toLowerCase().contains(keyWord.toLowerCase())))// 目录或文件包含关键字
                     return true;
