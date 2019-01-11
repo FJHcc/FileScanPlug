@@ -1,0 +1,14 @@
+C:\Users\greed\source\repos\FileScan\FileScan\bin\Debug\FileScan.exe.config
+C:\Users\greed\source\repos\FileScan\FileScan\bin\Debug\FileScan.exe
+C:\Users\greed\source\repos\FileScan\FileScan\bin\Debug\FileScan.pdb
+C:\Users\greed\source\repos\FileScan\FileScan\obj\Debug\FileScan.csprojAssemblyReference.cache
+C:\Users\greed\source\repos\FileScan\FileScan\obj\Debug\FileScan.csproj.CoreCompileInputs.cache
+C:\Users\greed\source\repos\FileScan\FileScan\obj\Debug\FileScan.exe
+C:\Users\greed\source\repos\FileScan\FileScan\obj\Debug\FileScan.pdb
+D:\MyGit\Sparks\src\FileScan\FileScan\obj\Debug\FileScan.csproj.CoreCompileInputs.cache
+D:\MyGit\Sparks\src\FileScan\FileScan\bin\Debug\FileScan.exe.config
+D:\MyGit\Sparks\src\FileScan\FileScan\bin\Debug\FileScan.exe
+D:\MyGit\Sparks\src\FileScan\FileScan\bin\Debug\FileScan.pdb
+D:\MyGit\Sparks\src\FileScan\FileScan\obj\Debug\FileScan.exe
+D:\MyGit\Sparks\src\FileScan\FileScan\obj\Debug\FileScan.pdb
+D:\MyGit\Sparks\src\FileScan\FileScan\obj\Debug\FileScan.csprojAssemblyReference.cache
