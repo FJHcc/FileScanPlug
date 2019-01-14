@@ -12,7 +12,7 @@ namespace FileScan
     {
         private static Dictionary<string,List<Dictionary<string, List<Dictionary<string,List<int>>>>>> result = new Dictionary<string, List<Dictionary<string, List<Dictionary<string, List<int>>>>>>();
         private const string rex = "(?s)(.*?)(?<=\")(\\s*select|\\s*join).*?((?<=where)|(?<=\";\r\n))";
-        private const string matchSelect = "(?s)(?<=\")\\s*select.*?((?=where)|(?<=\";))";
+        private const string matchSelect = "(?s)(?<=\")(\\s*select|\\s*join).*?((?=where)|(?<=\";))";
         //分解每条join的正则
         private const string JoinSelect = "join\\s{1,}.*(\\s*on).*";
         //select*的正则
