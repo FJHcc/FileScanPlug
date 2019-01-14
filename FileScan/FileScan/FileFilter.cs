@@ -10,14 +10,14 @@ namespace FileScan
 {
     public static class FileFilter
     {
-        private static Dictionary<string,List<Dictionary<string, List<int>>>> result = new Dictionary<string,List<Dictionary<string, List<int>>>>();
-        //存储找出的sql和对应位置
+        private static Dictionary<string,List<Dictionary<string, List<Dictionary<string,List<int>>>>>> result = new Dictionary<string, List<Dictionary<string, List<Dictionary<string, List<int>>>>>>();
         private const string rex = "(?s)(.*?)(?<=\")(\\s*select|\\s*join).*?((?<=where)|(?<=\";\r\n))";
+        private const string matchSelect = "(?s)(?<=\")\\s*select.*?((?=where)|(?<=\";))";
         //分解每条join的正则
-        private const string sqlJoin = "join\\s{1,}.*(\\s*on).*";
+        private const string JoinSelect = "join\\s{1,}.*(\\s*on).*";
         //select*的正则
-        private const string select = "(?s)(.*?)(?<=\")\\s*select.*?(?<=from)";
-        private const string errorSelect = "\\s*select\\s*\\*";
+        private const string select = "(?s)(.*?)(?<=\")\\s*select.*?\r\n";
+        private const string errorSelect = "\\s*select\\s*\\*.*?((?<=\",)|(?<=\";))";
         private const string sqlOrg = "(=\\s*)[a-z]*(.OrgId)";
         private const string lineRex = "\\\n";
         //错误类型
@@ -28,7 +28,7 @@ namespace FileScan
         /// </summary>
         /// <param name="fileList"></param>
         /// <returns></returns>
-        public static Dictionary<string, List<Dictionary<string, List<int>>>> Filter(List<string> fileList)
+        public static Dictionary<string, List<Dictionary<string, List<Dictionary<string, List<int>>>>>> Filter(List<string> fileList)
         {
             foreach (string path in fileList)
             {
@@ -40,8 +40,12 @@ namespace FileScan
                     {
                         //一次性读完文本内容
                         line = file.OpenText().ReadToEnd();
-                        FindJoinError(line,path);
-                        FindSelectError(line, path);
+                        //join语句错误
+                        var joinError = FindSqlError(line,rex, JoinSelect,path,ErrorEnum.JoinScreen);
+                        //select *错误
+                        var selectError = FindSqlError(line, select, errorSelect, path, ErrorEnum.SelectScreen);
+                        DictionaryAdd(result, errorMes[0], joinError);
+                        DictionaryAdd(result, errorMes[1], selectError);
                         file.OpenText().Close();
                         continue;
                     }
@@ -57,77 +61,65 @@ namespace FileScan
         }
 
         #region 私有方法
-        /// <summary>
-        /// 找出Join语句问题方法
-        /// </summary>
-        /// <param name="line"></param>
-        /// <param name="path"></param>
-        private static void FindJoinError(string line,string path)
-    {
-        var joinDictionary = new Dictionary<string, List<int>>();
-        var matchCollection = Regex.Matches(line, rex, RegexOptions.IgnoreCase);
-        int lineCount = 0;
-        foreach (var match in matchCollection)
+        
+        private static Dictionary<string,List<Dictionary<string,List<int>>>> FindSqlError(string line, string sqlRex, string errorSql,string path, ErrorEnum errorType)
         {
-            //计算行号
-            lineCount += CalculationCount(match.ToString(), lineRex);
-            //分解join语句
-            var matchCollectionJoin = Regex.Matches(match.ToString(), sqlJoin, RegexOptions.IgnoreCase);
-            //有join语句才进行计算，没有直接下一次
-            switch (matchCollectionJoin.Count)
+            var dictionary = new Dictionary<string, List<Dictionary<string, List<int>>>>();
+            var matchCollection = Regex.Matches(line, sqlRex, RegexOptions.IgnoreCase);
+            int lineCount = 0;
+            foreach(var match in matchCollection)
             {
-                case 0:
-                    break;
-                case 1:
-                    foreach (var joinInSql in matchCollectionJoin)
-                    {
-                        if(!Regex.IsMatch(joinInSql.ToString(), sqlOrg))
-                            {
-                                DictionaryAdd(joinDictionary, path, lineCount);
-                            }
-                    }
-                    break;
-                default:
-                    lineCount = lineCount - matchCollectionJoin.Count + 1;
-                    var nexLineCount = lineCount;
-                    foreach (var matchJoin in matchCollectionJoin)
-                    {
-                        if(!Regex.IsMatch(matchJoin.ToString(), sqlOrg))
-                        {
-                              DictionaryAdd(joinDictionary, path, nexLineCount++);
-                        }
-                        continue;
-                    }
-                    lineCount = nexLineCount - 1;
-                    break;
-            }                
-        }
-            DictionaryAdd(result, errorMes[0], joinDictionary);
-    }
-
-        /// <summary>
-        /// 找出select*问题方法
-        /// </summary>
-        /// <param name="line"></param>
-        /// <param name="path"></param>
-        private static void FindSelectError(string line, string path)
-    {
-        var selectDictionary = new Dictionary<string, List<int>>();
-        int lineCount = 0;
-        var matchCollection = Regex.Matches(line, select, RegexOptions.IgnoreCase);
-        foreach(var match in matchCollection)
-            {
-                //计算行号
                 lineCount += CalculationCount(match.ToString(), lineRex);
-                var matchCollectionSelect = Regex.Matches(match.ToString(), errorSelect, RegexOptions.IgnoreCase);
-                foreach (var matchSelect in matchCollectionSelect)
-                {
-                    DictionaryAdd(selectDictionary, path, lineCount + 1);
-                }
-
+                var matchCollectionError = Regex.Matches(match.ToString(), errorSql, RegexOptions.IgnoreCase);
+                MatchError(dictionary,match.ToString(),matchCollectionError,path,lineCount,errorType);
             }
-            DictionaryAdd(result,errorMes[1],selectDictionary);
+            return dictionary;
         }
+    //    /// <summary>
+    //    /// 找出Join语句问题方法
+    //    /// </summary>
+    //    /// <param name="line"></param>
+    //    /// <param name="path"></param>
+    //    private static void FindJoinError(string line,string path)
+    //{
+    //    var joinDictionary = new Dictionary<string, List<int>>();
+    //    var matchCollection = Regex.Matches(line, rex, RegexOptions.IgnoreCase);
+    //    int lineCount = 0;
+    //    foreach (var match in matchCollection)
+    //    {
+    //        //计算行号
+    //        lineCount += CalculationCount(match.ToString(), lineRex);
+    //        //分解join语句
+    //        var matchCollectionJoin = Regex.Matches(match.ToString(), sqlJoin, RegexOptions.IgnoreCase);
+    //        //有join语句才进行计算，没有直接下一次
+    //        MatchError(joinDictionary, matchCollectionJoin, path, lineCount);
+    //    }   
+    //        DictionaryAdd(result, errorMes[0], joinDictionary);
+    //}
+
+    //    /// <summary>
+    //    /// 找出select*问题方法
+    //    /// </summary>
+    //    /// <param name="line"></param>
+    //    /// <param name="path"></param>
+    //    private static void FindSelectError(string line, string path)
+    //{
+    //    var selectDictionary = new Dictionary<string, List<int>>();
+    //    int lineCount = 0;
+    //    var matchCollection = Regex.Matches(line, select, RegexOptions.IgnoreCase);
+    //    foreach(var match in matchCollection)
+    //        {
+    //            //计算行号
+    //            lineCount += CalculationCount(match.ToString(), lineRex);
+    //            var matchCollectionSelect = Regex.Matches(match.ToString(), errorSelect, RegexOptions.IgnoreCase);
+    //            foreach (var matchSelect in matchCollectionSelect)
+    //            {
+    //                DictionaryAdd(selectDictionary, path, lineCount);
+    //            }
+
+    //        }
+    //        DictionaryAdd(result,errorMes[1],selectDictionary);
+    //    }
 
         /// <summary>
         /// 字典Add去重方法
@@ -146,6 +138,7 @@ namespace FileScan
             {
                 dictionary.Add(key, new List<T> { addParameter });
             }
+            dictionary[key] = dictionary[key].Distinct().ToList();
         }
 
         /// <summary>
@@ -161,6 +154,77 @@ namespace FileScan
             count = matchCollection.Count;
             return count;
         }
+
+        /// <summary>
+        /// 删除多余空格方法
+        /// </summary>
+        /// <param name="old"></param>
+        /// <returns></returns>
+        private static string DeleteRedundantSpace(string old)
+        {
+            old = old.Replace("\r", "").Replace("\n", " ");
+            var newArray = old.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var newString = string.Join(" ", newArray);
+            return newString;
+        }
+
+        /// <summary>
+        /// 匹配sql错误方法
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="matchCollection"></param>
+        /// <param name="path"></param>
+        /// <param name="lineCount"></param>
+        private static void MatchError(Dictionary<string, List<Dictionary<string, List<int>>>> dictionary, string match, MatchCollection matchCollection, string path, int lineCount, ErrorEnum errorType)
+        {
+            var sqlDictionary = new Dictionary<string, List<int>>();
+            switch ((int)errorType)
+            {
+                //join筛选
+                case 1:
+                    switch (matchCollection.Count)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            if (!Regex.IsMatch(matchCollection[0].ToString(), sqlOrg))
+                            {
+                                var matchSql = Regex.Match(match, matchSelect, RegexOptions.IgnoreCase);
+                                DictionaryAdd(sqlDictionary, DeleteRedundantSpace(matchSql.ToString()), lineCount);
+                                DictionaryAdd(dictionary, path, sqlDictionary);
+                            }
+                            break;
+                        default:
+                            lineCount = lineCount - matchCollection.Count + 1;
+                            var nexLineCount = lineCount;
+                            foreach (var matchJoin in matchCollection)
+                            {
+                                if (!Regex.IsMatch(matchJoin.ToString(), sqlOrg))
+                                {
+                                    var matchSql = Regex.Match(match, matchSelect, RegexOptions.IgnoreCase);
+                                    DictionaryAdd(sqlDictionary, DeleteRedundantSpace(matchSql.ToString()), lineCount++);
+                                    DictionaryAdd(dictionary, path, sqlDictionary);
+                                }
+                            }
+                            lineCount = nexLineCount - 1;
+                            break;
+                    }
+                    break;
+                //select *筛选
+                case 2:
+                    if (matchCollection.Count > 0)
+                    {
+                        DictionaryAdd(sqlDictionary, matchCollection[0].ToString().Replace("\r", "").Replace("\n", ""), lineCount);
+                        DictionaryAdd(dictionary, path, sqlDictionary);
+                    }
+                    break;
+            }
+
+        }
     }
     #endregion
 }
+
+
+
+

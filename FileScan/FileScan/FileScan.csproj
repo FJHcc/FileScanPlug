@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enum\ErrorEnum.cs" />
     <Compile Include="FileFilter.cs" />
     <Compile Include="FileSearch.cs" />
     <Compile Include="Realization.cs" />

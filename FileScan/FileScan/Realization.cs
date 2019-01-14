@@ -27,13 +27,21 @@ namespace FileScan
                     write.WriteLine(files.Key+"\n");
                     foreach (var fileDictionary in files.Value)
                     {
-                        foreach(var singleFile in fileDictionary)
+                        foreach (var singleFile in fileDictionary)
                         {
                             write.WriteLine(singleFile.Key);
-                            write.Write("出错行号：");
-                            singleFile.Value.ForEach(position => write.Write(position + " "));
-                            write.WriteLine();
-                            write.WriteLine();
+                            foreach(var SqlAndPosition in singleFile.Value)
+                            {
+                                foreach (var singleSql in SqlAndPosition)
+                                {
+                                    write.Write("出错sql语句：");
+                                    write.WriteLine(singleSql.Key);
+                                    write.Write("出错行号：");
+                                    singleSql.Value.ForEach(position => write.Write(position + " "));
+                                    write.WriteLine();
+                                    write.WriteLine();
+                                } 
+                            }
                         }            
                     }
                 }
