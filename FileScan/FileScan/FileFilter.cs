@@ -10,6 +10,7 @@ namespace FileScan
 {
     public static class FileFilter
     {
+        //这个数据结构包装了很多层（为了显示错误类型、错误文件、错误sql以及错误位置）
         private static Dictionary<string,List<Dictionary<string, List<Dictionary<string,List<int>>>>>> result = new Dictionary<string, List<Dictionary<string, List<Dictionary<string, List<int>>>>>>();
         private const string rex = "(?s)(.*?)(?<=\")(\\s*select|\\s*join).*?((?<=where)|(?<=\";\r\n))";
         private const string matchSelect = "(?s)(?<=\")(\\s*select|\\s*join).*?((?=where)|(?<=\";))";
@@ -22,7 +23,6 @@ namespace FileScan
         private const string lineRex = "\\\n";
         //错误类型
         private static readonly string[] errorMes = new [] { "join语句缺少orgId的文件及位置：", "存在select *的的文件及位置：" }  ;
-
         /// <summary>
         /// 实现方法
         /// </summary>
@@ -47,7 +47,6 @@ namespace FileScan
                         DictionaryAdd(result, errorMes[0], joinError);
                         DictionaryAdd(result, errorMes[1], selectError);
                         file.OpenText().Close();
-                        continue;
                     }
                     else
                         continue;
@@ -61,7 +60,15 @@ namespace FileScan
         }
 
         #region 私有方法
-        
+        /// <summary>
+        /// 找错误实现
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="sqlRex"></param>
+        /// <param name="errorSql"></param>
+        /// <param name="path"></param>
+        /// <param name="errorType"></param>
+        /// <returns></returns>
         private static Dictionary<string,List<Dictionary<string,List<int>>>> FindSqlError(string line, string sqlRex, string errorSql,string path, ErrorEnum errorType)
         {
             var dictionary = new Dictionary<string, List<Dictionary<string, List<int>>>>();
@@ -75,54 +82,9 @@ namespace FileScan
             }
             return dictionary;
         }
-    //    /// <summary>
-    //    /// 找出Join语句问题方法
-    //    /// </summary>
-    //    /// <param name="line"></param>
-    //    /// <param name="path"></param>
-    //    private static void FindJoinError(string line,string path)
-    //{
-    //    var joinDictionary = new Dictionary<string, List<int>>();
-    //    var matchCollection = Regex.Matches(line, rex, RegexOptions.IgnoreCase);
-    //    int lineCount = 0;
-    //    foreach (var match in matchCollection)
-    //    {
-    //        //计算行号
-    //        lineCount += CalculationCount(match.ToString(), lineRex);
-    //        //分解join语句
-    //        var matchCollectionJoin = Regex.Matches(match.ToString(), sqlJoin, RegexOptions.IgnoreCase);
-    //        //有join语句才进行计算，没有直接下一次
-    //        MatchError(joinDictionary, matchCollectionJoin, path, lineCount);
-    //    }   
-    //        DictionaryAdd(result, errorMes[0], joinDictionary);
-    //}
-
-    //    /// <summary>
-    //    /// 找出select*问题方法
-    //    /// </summary>
-    //    /// <param name="line"></param>
-    //    /// <param name="path"></param>
-    //    private static void FindSelectError(string line, string path)
-    //{
-    //    var selectDictionary = new Dictionary<string, List<int>>();
-    //    int lineCount = 0;
-    //    var matchCollection = Regex.Matches(line, select, RegexOptions.IgnoreCase);
-    //    foreach(var match in matchCollection)
-    //        {
-    //            //计算行号
-    //            lineCount += CalculationCount(match.ToString(), lineRex);
-    //            var matchCollectionSelect = Regex.Matches(match.ToString(), errorSelect, RegexOptions.IgnoreCase);
-    //            foreach (var matchSelect in matchCollectionSelect)
-    //            {
-    //                DictionaryAdd(selectDictionary, path, lineCount);
-    //            }
-
-    //        }
-    //        DictionaryAdd(result,errorMes[1],selectDictionary);
-    //    }
 
         /// <summary>
-        /// 字典Add去重方法
+        /// 字典Add的key去重方法
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dictionary"></param>
@@ -138,6 +100,7 @@ namespace FileScan
             {
                 dictionary.Add(key, new List<T> { addParameter });
             }
+            //List去重
             dictionary[key] = dictionary[key].Distinct().ToList();
         }
 
@@ -219,12 +182,7 @@ namespace FileScan
                     }
                     break;
             }
-
         }
     }
     #endregion
 }
-
-
-
-

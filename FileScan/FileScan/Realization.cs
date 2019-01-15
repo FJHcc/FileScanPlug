@@ -15,12 +15,12 @@ namespace FileScan
             var path = System.AppDomain.CurrentDomain.BaseDirectory;
 
             //筛选文件
-            var fileList = FileSearch.searchFile("D:\\MyGit\\Sparks\\src");
+            var fileList = FileSearch.searchFile(path);
             //文件内容筛选
             var fileResult = FileFilter.Filter(fileList);
             if (fileResult.Count > 0)
             {
-                var newTxtPath = "D:\\MyGit\\Sparks\\src\\出错文件及位置.txt";
+                var newTxtPath = path+"\\出错文件及位置.txt";
                 var write = new StreamWriter(newTxtPath, false, Encoding.Default);
                 foreach (var files in fileResult)
                 {
