@@ -10,7 +10,7 @@ namespace FileScan
 {
     public static class FileFilter
     {
-        //这个数据结构包装了很多层（为了显示错误类型、错误文件、错误sql以及错误位置）
+        //这个数据结构包装了很多层（为了显示错误类型、错误文件、错误sql以及错误位置,还在思考是否用Model来建立这个数据结构）
         private static Dictionary<string,List<Dictionary<string, List<Dictionary<string,List<int>>>>>> result = new Dictionary<string, List<Dictionary<string, List<Dictionary<string, List<int>>>>>>();
         private const string rex = "(?s)(.*?)(?<=\")(\\s*select|\\s*join).*?((?<=where)|(?<=\";\r\n))";
         private const string matchSelect = "(?s)(?<=\")(\\s*select|\\s*join).*?((?=where)|(?<=\";))";
