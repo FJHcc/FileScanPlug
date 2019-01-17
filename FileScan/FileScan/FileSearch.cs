@@ -8,7 +8,7 @@ namespace FileScan
     public  class FileSearch
     {
         public static List<string> fileList = new List<string>();
-        public static List<string> searchFile(string folder)
+        public static List<string> SearchFile(string folder)
         {
             //传进来如果只是一个文件
             if (File.Exists(folder))
