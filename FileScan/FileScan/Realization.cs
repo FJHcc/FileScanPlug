@@ -15,7 +15,7 @@ namespace FileScan
             var path = System.AppDomain.CurrentDomain.BaseDirectory;
 
             //筛选文件
-            var fileList = FileSearch.searchFile(path);
+            var fileList = FileSearch.searchFile("D:\\MyGit\\Sparks\\src");
             //文件内容筛选
             var fileResult = FileFilter.Filter(fileList);
             if (fileResult.Count > 0)
@@ -30,18 +30,10 @@ namespace FileScan
                         foreach (var singleFile in fileDictionary)
                         {
                             write.WriteLine(singleFile.Key);
-                            foreach(var SqlAndPosition in singleFile.Value)
-                            {
-                                foreach (var singleSql in SqlAndPosition)
-                                {
-                                    write.Write("出错sql语句：");
-                                    write.WriteLine(singleSql.Key);
-                                    write.Write("出错行号：");
-                                    singleSql.Value.ForEach(position => write.Write(position + " "));
-                                    write.WriteLine();
-                                    write.WriteLine();
-                                } 
-                            }
+                            write.Write("出错sql语句：");
+                            singleFile.Value.ForEach(sql => write.WriteLine(sql));
+                            write.WriteLine();
+                            write.WriteLine();
                         }            
                     }
                 }
@@ -55,7 +47,6 @@ namespace FileScan
                 Console.WriteLine("文件正常");
                 Console.ReadKey();
             }
-
 
         }
     }

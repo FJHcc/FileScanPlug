@@ -21,27 +21,10 @@ namespace FileScan
                 return fileList;
             }
             DirectoryInfo dir = new DirectoryInfo(folder);
-            DirectoryInfo[] dirs = dir.GetDirectories();
-            //如果文件夹内没有子目录了
-            if (dirs.Length <= 0)
+            FileInfo[] files = dir.GetFiles("*Repository.cs", SearchOption.AllDirectories);
+            foreach(var file in files)
             {
-                foreach (FileInfo file in dir.GetFiles("*Repository.cs", SearchOption.TopDirectoryOnly))
-                {
-                    fileList.Add(dir + @"\" + file.ToString());
-                }
-            }
-            int t = 1;
-            foreach (DirectoryInfo dirInfo in dirs)
-            {
-                searchFile(dir + @"\" + dirInfo.ToString());
-                if (t == 1)
-                {
-                    foreach (FileInfo file in dir.GetFiles("*Repository.cs", SearchOption.TopDirectoryOnly))
-                    {
-                        fileList.Add(dir + @"\" + file.ToString());
-                    }
-                    t++;
-                }
+                fileList.Add(file.FullName);
             }
             return fileList;
         }

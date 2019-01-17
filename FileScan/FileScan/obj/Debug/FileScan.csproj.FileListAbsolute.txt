@@ -19,3 +19,10 @@ D:\MyGit\JavaPlug\FileScan\FileScan\obj\Debug\FileScan.csprojAssemblyReference.c
 D:\MyGit\JavaPlug\FileScan\FileScan\obj\Debug\FileScan.csproj.CoreCompileInputs.cache
 D:\MyGit\JavaPlug\FileScan\FileScan\obj\Debug\FileScan.exe
 D:\MyGit\JavaPlug\FileScan\FileScan\obj\Debug\FileScan.pdb
+D:\MyGit\Sparks\tools\FileScan\FileScan\bin\Debug\FileScan.exe.config
+D:\MyGit\Sparks\tools\FileScan\FileScan\bin\Debug\FileScan.exe
+D:\MyGit\Sparks\tools\FileScan\FileScan\bin\Debug\FileScan.pdb
+D:\MyGit\Sparks\tools\FileScan\FileScan\obj\Debug\FileScan.csproj.CoreCompileInputs.cache
+D:\MyGit\Sparks\tools\FileScan\FileScan\obj\Debug\FileScan.exe
+D:\MyGit\Sparks\tools\FileScan\FileScan\obj\Debug\FileScan.pdb
+D:\MyGit\Sparks\tools\FileScan\FileScan\obj\Debug\FileScan.csprojAssemblyReference.cache
